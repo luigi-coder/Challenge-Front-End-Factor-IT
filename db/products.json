@@ -1,0 +1,17 @@
+{
+
+    "products" : [
+        {"id": 1, "nombre": "Bicicleta de Montaña", "precio": 175000},
+        {"id": 2, "nombre": "Bicicleta de Carretera", "precio": 195000},
+        {"id": 3, "nombre": "Bicicleta Híbrida", "precio": 185000},
+        {"id": 4, "nombre": "Bicicleta de Ciudad", "precio": 160000},
+        {"id": 5, "nombre": "Bicicleta Plegable", "precio": 175000},
+        {"id": 6, "nombre": "Bicicleta BMX", "precio": 170000},
+        {"id": 7, "nombre": "Bicicleta de Niño", "precio": 160000},
+        {"id": 8, "nombre": "Bicicleta Eléctrica de Montaña", "precio": 195000},
+        {"id": 9, "nombre": "Bicicleta Eléctrica de Ciudad", "precio": 190000},
+        {"id": 10, "nombre": "Bicicleta de Ciclocross", "precio": 175000},
+        {"id": 11, "nombre": "Bicicleta Tándem", "precio": 200000},
+        {"id": 12, "nombre": "Bicicleta de Touring", "precio": 195000}
+    ]
+}
