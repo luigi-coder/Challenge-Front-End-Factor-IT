@@ -51,7 +51,6 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
         if (cantidadProductos === 4) {
             return totalAPagar * 0.75; // Aplica el descuento del 25%
         } else if (cantidadProductos > 10) {
-
             let descuento = 0;
             // Si el gastó el mes anterior fue mayor a 10000, aplica el descuento de $500
             if (cliente === 'VIP') {
@@ -72,16 +71,23 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
         // Crear un objeto para rastrear la cantidad de cada producto en la compra
         const cantidadPorProducto = {};
 
+        const totalPorProducto = {};
+
         // Recorrer el carrito único y contar la cantidad de cada producto
         carritoUnico.forEach((productoUnico) => {
             const cantidad = carrito.filter((p) => p.id === productoUnico.id).length;
             cantidadPorProducto[productoUnico.id] = cantidad;
+            totalPorProducto[productoUnico.id] = cantidad * productoUnico.precio;
         });
+
+        // Calcular el total de la compra sumando el total de cada producto
+        const total = Object.values(totalPorProducto).reduce((total, precio) => total + precio, 0);
 
         // Crear una lista de productos con sus cantidades
         const compra = carritoUnico.map((productoUnico) => ({
             producto: productoUnico,
             cantidad: cantidadPorProducto[productoUnico.id],
+            total: totalPorProducto[productoUnico.id],
         }));
 
         // La variable 'compra' ahora contiene la lista de productos comprados con sus cantidades

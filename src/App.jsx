@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react"
 import { Cart } from "./components/Cart"
 import { ProductList } from "./components/ProductList";
+import { getVipClients } from "./helpers/getVipClients";
 
 
 function App() {
 
+  // Suponiendo que gastoMesAnterior es el valor obtenido de algún lugar por ejemplo de una base de datos
+  const gastoMesAnterior = 12000;
+
   const [productos, setProductos] = useState([]);
   const [cliente, setCliente] = useState('comun');
   const fechaEspecial = new Date();
+  const [clientesVip, setClientesVip] = useState([]);
+
+  const useFetchClients = async () => {
+    const clientsVip = await getVipClients(gastoMesAnterior);
+    setClientesVip(clientsVip);
+  }
+  
 
   const getProductFetch = async () => {
 
@@ -16,25 +27,6 @@ function App() {
       const resp = await fetch('http://localhost:3000/products');
       const data = await resp.json();
       setProductos(data);
-
-      // Suponiendo que gastoMesAnterior es el valor obtenido de algún lugar por ejemplo de una base de datos
-      const gastoMesAnterior = 12000;
-
-      // Verificar si es un día especial 28 de octubre el cliente es promocional
-      if (fechaEspecial.getDate() === 28 && fechaEspecial.getMonth() === 9) {
-        setCliente('Promocional');
-      } else {
-        // Verificar si el gasto del mes anterior es mayor que 10000
-        if (gastoMesAnterior > 10000) {
-          setCliente('VIP'); // Actualizar el estado del cliente a "VIP"
-        }
-        // Si el cliente en un determinado mes no realizó compras, se le asigna el estado "comun"
-        if (gastoMesAnterior === 0) {
-          setCliente('comun');
-        }
-      }
-
-
 
     } catch (error) {
       console.log(error);
@@ -73,10 +65,47 @@ function App() {
     setCarrito([]);
   }
 
+  
+
+  useEffect(()=>{
+    // Verificar si es un día especial 28 de octubre el cliente es promocional
+    if (fechaEspecial.getDate() === 28 && fechaEspecial.getMonth() === 9) {
+      setCliente('Promocional');
+    }else {
+      // Verificar si el gasto del mes anterior es mayor que 10000
+      if (gastoMesAnterior > 10000) {
+        setCliente('VIP'); // Actualizar el estado del cliente a "VIP"
+      } 
+      // Si el cliente en un determinado mes no realizó compras, se le asigna el estado "comun"
+      if (gastoMesAnterior === 0) {
+        setCliente('comun');
+      } 
+    } 
+  }, [fechaEspecial, gastoMesAnterior])
+
+
+
   return (
     <>
       <h1>Ecommerce Challenge Factor IT</h1>
-      <h2>Carrito : {cliente}</h2>
+      <div style={{
+        width: '40%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h2>Carrito : {cliente}</h2>
+        <button
+          onClick={useFetchClients}
+          style={{
+            backgroundColor: 'green',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '10px',
+            border: 'none'
+          }}
+        >Clientes VIP</button>
+      </div>
       <ProductList productos={productos} agregarAlCarrito={agregarAlCarrito} />
       <Cart
         carrito={carrito}
