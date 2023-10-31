@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
+export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }) => {
 
     const [timer, settimer] = useState(null);
 
@@ -40,22 +40,22 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
 
     let totalAPagar = carritoUnico.reduce((total, producto) => {
         const cantidad = carrito.filter((p) => p.id === producto.id).length;
-        return total + producto.precio * cantidad;
+        return total + producto.price * cantidad;
     }, 0);
 
     // Función para calcular el total a pagar
     const calcularTotal = () => {
-        //const productosUnicos = [...new Set(carrito.map((p) => p.id))];
         const cantidadProductos = carrito.length;
 
         if (cantidadProductos === 4) {
             return totalAPagar * 0.75; // Aplica el descuento del 25%
         } else if (cantidadProductos > 10) {
+
             let descuento = 0;
             // Si el gastó el mes anterior fue mayor a 10000, aplica el descuento de $500
-            if (cliente === 'VIP') {
+            if (cliente === 'vip') {
                 descuento = 500;
-            } else if (cliente === 'Promocional') {
+            } else if (cliente === 'promocional') {
                 descuento = 300;
             }
             return totalAPagar - descuento;
@@ -77,32 +77,28 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
         carritoUnico.forEach((productoUnico) => {
             const cantidad = carrito.filter((p) => p.id === productoUnico.id).length;
             cantidadPorProducto[productoUnico.id] = cantidad;
-            totalPorProducto[productoUnico.id] = cantidad * productoUnico.precio;
+            totalPorProducto[productoUnico.id] = cantidad * productoUnico.price;
         });
 
         // Calcular el total de la compra sumando el total de cada producto
         const total = Object.values(totalPorProducto).reduce((total, precio) => total + precio, 0);
 
         // Crear una lista de productos con sus cantidades
-        const compra = carritoUnico.map((productoUnico) => ({
-            producto: productoUnico,
-            cantidad: cantidadPorProducto[productoUnico.id],
-            total: totalPorProducto[productoUnico.id],
-        }));
-
-        // La variable 'compra' ahora contiene la lista de productos comprados con sus cantidades
-        console.log('Compra:', compra);
-
-        // Llama a la función para registrar la compra y pasa 'compra' como argumento
+        const compra = {
+            isVip: cliente,
+            lastPurchaseDate: new Date().toISOString(),
+            username: user,
+            totalAmount: total,
+        }
         registrarCompra(compra);
 
-        // Aquí puedes realizar otras acciones, como mostrar un mensaje de confirmación
+        vaciarCarrito();        
     };
 
     const registrarCompra = async (compra) => {
 
         try {
-            const response = await fetch('http://localhost:3000/compras', {
+            const response = await fetch('http://localhost:8080/api/shopping/add', {
 
                 method: 'POST',
                 headers: {
@@ -130,8 +126,10 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '1rem',
+                marginTop: '2rem',
             }}>
-                <h2>Carrito de Compras</h2>
+                <h2>Carrito de Compras {cliente}</h2>
+                
                 <button
                     onClick={vaciarCarrito}
                 >Vaciar el carrito</button>
@@ -142,7 +140,7 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
                         const cantidad = carrito.filter((p) => p.id === producto.id).length;
                         return (
                             <li key={producto.id + '_' + Math.random()}>
-                                {producto.nombre} - ${producto.precio}
+                                {producto.name} - ${producto.price}
                                 <p>{cantidad}</p>
                                 <button onClick={() => eliminarProducto(producto)}>Eliminar</button>
                             </li>
@@ -152,8 +150,8 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
             ) : (
                 <p>El carrito está vacío.</p>
             )}
-            <p>Total a pagar con descuento: ${calcularTotal()}</p>
-            <p>Total a pagar sin descuento ${totalAPagar}</p>
+            <p>Total a pagar con descuento: ${calcularTotal().toFixed(2)}</p>
+            <p>Total a pagar sin descuento ${totalAPagar.toFixed(2)}</p>
             <br />
             <button
                 onClick={() => handlePagarClick()}
@@ -161,4 +159,8 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito }) => {
         </div>
     );
 };
+
+
+
+
 

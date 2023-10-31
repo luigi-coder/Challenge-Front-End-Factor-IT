@@ -7,7 +7,7 @@ export const ProductList = ({ productos, agregarAlCarrito }) => {
       <ul>
         {productos.map((producto) => (
           <li key={producto.id}>
-            {producto.nombre} - ${producto.precio}
+            {producto.name} - ${producto.price}
             <button onClick={() => agregarAlCarrito(producto)}>Agregar al Carrito</button>
           </li>
         ))}
