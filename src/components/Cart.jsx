@@ -4,6 +4,8 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
 
     const [timer, settimer] = useState(null);
 
+    // STARTTIMER con los 4 useEffects destruyen el carrito a las 24hs de inactividad en el carrito
+
     // Función para iniciar el temporizador
     const startTimer = () => {
 
@@ -43,16 +45,15 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
         return total + producto.price * cantidad;
     }, 0);
 
-    // Función para calcular el total a pagar
     const calcularTotal = () => {
         const cantidadProductos = carrito.length;
 
         if (cantidadProductos === 4) {
-            return totalAPagar * 0.75; // Aplica el descuento del 25%
+            return totalAPagar * 0.75;
         } else if (cantidadProductos > 10) {
 
             let descuento = 0;
-            // Si el gastó el mes anterior fue mayor a 10000, aplica el descuento de $500
+
             if (cliente === 'vip') {
                 descuento = 500;
             } else if (cliente === 'promocional') {
@@ -61,29 +62,26 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
             return totalAPagar - descuento;
         }
 
-        return totalAPagar; // Si no se cumple la condición, devuelve el total sin descuento
+        return totalAPagar;
     }
 
     const handlePagarClick = () => {
-        // Obtener el carrito único con productos únicos
+
         const carritoUnico = [...new Set(carrito)];
 
-        // Crear un objeto para rastrear la cantidad de cada producto en la compra
         const cantidadPorProducto = {};
 
         const totalPorProducto = {};
 
-        // Recorrer el carrito único y contar la cantidad de cada producto
         carritoUnico.forEach((productoUnico) => {
             const cantidad = carrito.filter((p) => p.id === productoUnico.id).length;
             cantidadPorProducto[productoUnico.id] = cantidad;
             totalPorProducto[productoUnico.id] = cantidad * productoUnico.price;
         });
 
-        // Calcular el total de la compra sumando el total de cada producto
+
         const total = Object.values(totalPorProducto).reduce((total, precio) => total + precio, 0);
 
-        // Crear una lista de productos con sus cantidades
         const compra = {
             isVip: cliente,
             lastPurchaseDate: new Date().toISOString(),
@@ -92,7 +90,7 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
         }
         registrarCompra(compra);
 
-        vaciarCarrito();        
+        vaciarCarrito();
     };
 
     const registrarCompra = async (compra) => {
@@ -119,7 +117,11 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
     }
 
     return (
-        <div>
+        <div
+            style={{
+                marginBottom: '3rem',
+            }}
+        >
             <div style={{
                 width: '40%',
                 display: 'flex',
@@ -129,24 +131,41 @@ export const Cart = ({ carrito, eliminarProducto, cliente, vaciarCarrito, user }
                 marginTop: '2rem',
             }}>
                 <h2>Carrito de Compras {cliente}</h2>
-                
+
                 <button
                     onClick={vaciarCarrito}
                 >Vaciar el carrito</button>
             </div>
             {carritoUnico.length > 0 ? (
-                <ul>
-                    {carritoUnico.map((producto) => {
-                        const cantidad = carrito.filter((p) => p.id === producto.id).length;
-                        return (
-                            <li key={producto.id + '_' + Math.random()}>
-                                {producto.name} - ${producto.price}
-                                <p>{cantidad}</p>
-                                <button onClick={() => eliminarProducto(producto)}>Eliminar</button>
-                            </li>
-                        );
-                    })}
-                </ul>
+                <table style={{ width: '100%', border: '4px solid red' }}>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {carritoUnico.map((producto) => {
+                            const cantidad = carrito.filter((p) => p.id === producto.id).length;
+                            return (
+                                <tr
+                                style={{
+                                    textAlign: 'center',
+                                }} 
+                                key={producto.id + '_' + Math.random()}>
+                                    <td>{producto.name}</td>
+                                    <td>${producto.price}</td>
+                                    <td>{cantidad}</td>
+                                    <td>
+                                        <button onClick={() => eliminarProducto(producto)}>Eliminar</button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
             ) : (
                 <p>El carrito está vacío.</p>
             )}

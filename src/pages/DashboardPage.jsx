@@ -50,17 +50,15 @@ const DashboardPage = () => {
     };
 
     const eliminarProducto = (producto) => {
-        // Busca el índice del producto en el carrito
+      
         const index = carrito.findIndex((p) => p.id === producto.id);
 
         if (index !== -1) {
-            // Clonar el carrito para evitar mutaciones directas
+           
             const nuevoCarrito = [...carrito];
-
-            // Elimina el producto del carrito usando splice
+            
             nuevoCarrito.splice(index, 1);
 
-            // Actualiza el estado del carrito
             setCarrito(nuevoCarrito);
         }
     }
@@ -77,7 +75,6 @@ const DashboardPage = () => {
     }, [fechaEspecial]);
 
     useEffect(() => {
-        // Llama a la función getPreviousMonth aquí o en otro lugar según tu lógica
         const fetchDataForPreviousMonth = async (user) => {
             try {
                 console.log("Obteniendo datos del mes anterior...");
@@ -94,16 +91,15 @@ const DashboardPage = () => {
 
             } catch (error) {
                 console.error("Error al obtener los datos del mes anterior:", error);
-                // Maneja el error si es necesario
             }
         };
 
         fetchDataForPreviousMonth(state?.user);
-    }, []); // Asegúrate de ajustar las dependencias del useEffect según tu lógica
-
+    }, []); 
 
     return (
         <>
+            <div>
             <h1>Ecommerce Challenge Factor IT</h1>
             <div style={{
                 width: '40%',
@@ -139,7 +135,18 @@ const DashboardPage = () => {
                     </div>
                 )
             }
-            <ProductList productos={productos} agregarAlCarrito={agregarAlCarrito} />
+
+            <h2>Productos Disponibles</h2>
+            
+            <ProductList 
+            style={{
+                width: '100%',
+                marginLeft: '100px',
+                
+            }}
+            productos={productos} 
+            agregarAlCarrito={agregarAlCarrito} />
+
             <Cart
                 carrito={carrito}
                 eliminarProducto={eliminarProducto}
@@ -147,6 +154,8 @@ const DashboardPage = () => {
                 vaciarCarrito={vaciarCarrito}
                 user={state?.user}
             />
+            </div>
+            
         </>
     )
 }
